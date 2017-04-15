@@ -68,7 +68,7 @@ public class MinimalSpaceship : MonoBehaviour
 
     void Rotate(float angle)
     {
-        Debug.Log("Frame: " + Time.frameCount + " Rotate angle: " + angle);
+        //Debug.Log("Frame: " + Time.frameCount + " Rotate angle: " + angle);
         float direction = 0;
         if (angle < 0)
         {
@@ -98,9 +98,13 @@ public class MinimalSpaceship : MonoBehaviour
     /// </summary>
     void ApproachPosition()
     {
-        float steeringAngle = AngleToSeek(TargetPosition);
-        Debug.Log("Frame: " + Time.frameCount + " Approach Position. currentFacing: " + currentFacing + " currentHeading: " + currentHeading + " steeringAngle: " + steeringAngle);
-        Rotate(GetAngleTowardsTargetAngle(steeringAngle));
+        Vector2 steeringVector;
+        float steeringAngle = AngleToSeek(TargetPosition, out steeringVector);
+        //Debug.Log("Frame: " + Time.frameCount + " Approach Position. currentFacing: " + currentFacing + " currentHeading: " + currentHeading + " steeringAngle: " + steeringAngle);
+        if (Vector2.Dot(myRigidBody2D.velocity, steeringVector) < 0)
+        {
+            Rotate(GetAngleTowardsTargetAngle(steeringAngle));
+        }
 
         if (Mathf.Abs(currentFacing - steeringAngle) <= 0.1f)
         {
@@ -115,10 +119,10 @@ public class MinimalSpaceship : MonoBehaviour
     /// </summary>
     /// <param name="target"></param>
     /// <returns></returns>
-    protected float AngleToSeek(Vector2 target)
+    protected float AngleToSeek(Vector2 target, out Vector2 steeringVector)
     {
         Vector2 desiredVelocity = (target - (Vector2)transform.position).normalized * maxVelocity;
-        Vector2 steeringVector;
+        //Vector2 steeringVector;
         if (velocity.magnitude > maxVelocity)
         {
             steeringVector = desiredVelocity - (velocity.normalized * maxVelocity * 0.9f);
@@ -127,7 +131,6 @@ public class MinimalSpaceship : MonoBehaviour
         {
             steeringVector = desiredVelocity - velocity;
         }
-
         return AngleToVector(steeringVector);
     }
     #endregion
